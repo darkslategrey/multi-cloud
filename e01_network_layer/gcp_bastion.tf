@@ -2,6 +2,7 @@
 
 resource "google_compute_instance" "bastion" {
   name         = "gcp-bastion"
+  project      = "${var.gcp_project}"
   machine_type = "${var.gcp_instance_type}"
   zone         = "${var.region_gcp}-${element(var.az_gcp, count.index)}"
   can_ip_forward = true

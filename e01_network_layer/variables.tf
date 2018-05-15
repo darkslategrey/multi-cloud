@@ -1,40 +1,16 @@
 # Commons
 
 variable "private_key_path" {
-  default = "~/.ssh/id_rsa"
-}
-
-# AWS Vars
-
-variable "region_aws" {
-  default = "us-west-2"
-}
-
-variable "az_aws" {
-  default = [
-      "a",
-      "b",
-      "c"
-    ]
-}
-
-variable "aws_instance_type" {
-  default = "t2.micro"
-}
-
-variable "aws_image" {
-  default = "ami-d2c924b2"
-}
-
-variable "keypair" {
-  description = "AWS Keypair"
-  default = "main"
+  default = "~/.ssh/google_compute_engine"
 }
 
 # GCP Vars
 
+variable "gcp_project" {
+  default = "courseur-1234"
+}
 variable "gcp_user" {
-  default = "bcadiot"
+  default = "Courseur"
 }
 
 variable "region_gcp" {
