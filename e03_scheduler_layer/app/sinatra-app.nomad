@@ -1,6 +1,7 @@
-job "demoapp" {
-  region = "us"
-  datacenters = ["us-west-2"]
+job "sinatraapp" {
+  region = "europe"
+  datacenters = ["europe-west1"]
+  # datacenters = ["dc1"]
 
   type = "service"
 
@@ -9,7 +10,7 @@ job "demoapp" {
     max_parallel = 1
   }
 
-  group "webs" {
+  group "webs-sinatra" {
     count = 2
 
     restart {
@@ -19,11 +20,11 @@ job "demoapp" {
       mode = "delay"
     }
 
-    task "frontend" {
+    task "sinatra-server" {
       driver = "docker"
 
       config {
-        image = "httpd"
+        image = "courseur/ruby-sinatra"
         port_map = {
           http = 80
         }
@@ -32,18 +33,19 @@ job "demoapp" {
       service {
         port = "http"
         tags = [
-          "traefik.frontend.rule=Host:demo.exemple.com",
+          "traefik.frontend.rule=Host:sinatra.exemple.com",
           "traefik.tags=exposed"
-          ]
+        ]
       }
 
       resources {
-        cpu    = 300
-        memory = 128
+        cpu    = 200
+        memory = 64
 
         network {
           mbits = 10
           port "http" {
+            # static = 8080
           }
         }
       }

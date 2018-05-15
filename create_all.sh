@@ -9,7 +9,7 @@ cd ../e02_services_lb_layer/
 terraform apply
 cd ../e03_scheduler_layer/
 terraform apply
-cd ../e04_data_layer/
-terraform apply
-cd ../e05_app_layer/
-terraform apply
+# cd ../e04_data_layer/
+# terraform apply
+# cd ../e05_app_layer/
+# terraform apply

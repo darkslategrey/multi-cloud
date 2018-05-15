@@ -1,30 +1,9 @@
-# AWS Vars
-
-variable "aws_user" {
-  default = "centos"
+variable "gcp_project" {
+  default = "courseur-1234"
 }
-
-variable "aws_region" {
-  default = "us-west-2"
-}
-
-variable "aws_instance_type" {
-  default = "t2.micro"
-}
-
-variable "aws_image" {
-  default = "ami-d2c924b2"
-}
-
-variable "keypair" {
-  description = "AWS Keypair"
-  default = "main"
-}
-
-# GCP Vars
 
 variable "gcp_user" {
-  default = "bcadiot"
+  default = "courseur"
 }
 
 variable "gcp_region" {
@@ -39,8 +18,12 @@ variable "az_gcp" {
     ]
 }
 
-variable "gcp_instance_type" {
+variable "gcp_server_instance_type" {
   default = "f1-micro"
+}
+
+variable "gcp_client_instance_type" {
+  default = "g1-small"
 }
 
 variable "gcp_image" {

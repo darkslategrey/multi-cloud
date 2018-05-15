@@ -22,22 +22,6 @@ resource "fastly_service_v1" "app" {
     healthcheck = "apphealth"
   }
 
-  backend {
-    address = "${data.terraform_remote_state.consul.aws_traefik_public_ips.0}"
-    name    = "AWS LB 1 hosting"
-    port    = 80
-    error_threshold = 5
-    healthcheck = "apphealth"
-  }
-
-  backend {
-    address = "${data.terraform_remote_state.consul.aws_traefik_public_ips.1}"
-    name    = "AWS LB 2 hosting"
-    port    = 80
-    error_threshold = 5
-    healthcheck = "apphealth"
-  }
-
   healthcheck {
     method         = "GET"
     host           = "${var.app-subdomain}.${var.domain}"

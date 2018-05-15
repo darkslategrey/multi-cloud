@@ -46,7 +46,7 @@ data "template_file" "gcp_traefik_bootstrap" {
     zone = "$(curl http://metadata.google.internal/computeMetadata/v1/instance/zone -H \"Metadata-Flavor: Google\" | cut -d\"/\" -f4)"
     datacenter = "$(echo $${ZONE} | cut -d\"-\" -f1)-$(echo $${ZONE} | cut -d\"-\" -f2)"
     output_ip = "$(curl http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/ip -H \"Metadata-Flavor: Google\")"
-    consul_version = "0.9.2"
+    consul_version = "1.0.7"
     traefik_version = "1.3.2"
     join = "\"retry_join\": [\"provider=gce tag_value=consul-servers\"]"
     node_name = "server-gcp-traefik-${count.index + 1}"

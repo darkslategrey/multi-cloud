@@ -94,7 +94,7 @@ EOF
 
 install_consul()
 {
-	wget -qP /tmp https://releases.hashicorp.com/consul/$${CONSUL_VERSION}/consul_$${CONSUL_VERSION}_linux_amd64.zip && unzip /tmp/consul_$${CONSUL_VERSION}_linux_amd64.zip -d /usr/bin/ && rm -f /tmp/consul_$${CONSUL_VERSION}_linux_amd64.zip
+	wget -P /tmp https://releases.hashicorp.com/consul/$${CONSUL_VERSION}/consul_$${CONSUL_VERSION}_linux_amd64.zip && unzip /tmp/consul_$${CONSUL_VERSION}_linux_amd64.zip -d /usr/bin/ && rm -f /tmp/consul_$${CONSUL_VERSION}_linux_amd64.zip
 
 	adduser consul
 	mkdir -p /etc/consul /var/consul
@@ -143,7 +143,7 @@ EOF
 
 install_traefik()
 {
-	wget -qP /usr/bin https://github.com/containous/traefik/releases/download/v$${TRAEFIK_VERSION}/traefik_linux-amd64 && mv /usr/bin/traefik_linux-amd64 /usr/bin/traefik && chmod +x /usr/bin/traefik
+	wget -P /usr/bin https://github.com/containous/traefik/releases/download/v$${TRAEFIK_VERSION}/traefik_linux-amd64 && mv /usr/bin/traefik_linux-amd64 /usr/bin/traefik && chmod +x /usr/bin/traefik
 
 	mkdir -p /etc/traefik /var/traefik
 

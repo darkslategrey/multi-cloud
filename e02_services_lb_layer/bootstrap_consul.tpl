@@ -88,7 +88,7 @@ EOF
 
 install_consul()
 {
-	wget -qP /tmp https://releases.hashicorp.com/consul/$${CONSUL_VERSION}/consul_$${CONSUL_VERSION}_linux_amd64.zip && unzip /tmp/consul_$${CONSUL_VERSION}_linux_amd64.zip -d /usr/bin/ && rm -f /tmp/consul_$${CONSUL_VERSION}_linux_amd64.zip
+	wget -P /tmp https://releases.hashicorp.com/consul/$${CONSUL_VERSION}/consul_$${CONSUL_VERSION}_linux_amd64.zip && unzip /tmp/consul_$${CONSUL_VERSION}_linux_amd64.zip -d /usr/bin/ && rm -f /tmp/consul_$${CONSUL_VERSION}_linux_amd64.zip
 
 	adduser consul
 	mkdir -p /etc/consul /var/consul
@@ -104,7 +104,7 @@ After=basic.target network.target docker.service
 User=consul
 Group=consul
 EnvironmentFile=-/etc/sysconfig/consul
-ExecStart=/usr/bin/consul agent -config-dir /etc/consul $OPTIONS
+ExecStart=/usr/bin/consul agent -ui -config-dir /etc/consul $OPTIONS
 ExecReload=/bin/kill -HUP $MAINPID
 KillMode=process
 Restart=on-failure

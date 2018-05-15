@@ -1,5 +1,6 @@
 resource "google_compute_firewall" "icmp" {
   name    = "icmp"
+  project = "${var.gcp_project}"
   network = "${google_compute_network.nomad.name}"
 
   allow {
@@ -11,6 +12,7 @@ resource "google_compute_firewall" "icmp" {
 
 resource "google_compute_firewall" "ssh" {
   name    = "ssh"
+  project = "${var.gcp_project}"
   network = "${google_compute_network.nomad.name}"
 
   allow {
@@ -23,6 +25,7 @@ resource "google_compute_firewall" "ssh" {
 
 resource "google_compute_firewall" "bastion_nat" {
   name    = "bastion-nat"
+  project = "${var.gcp_project}"
   network = "${google_compute_network.nomad.name}"
 
   allow {
