@@ -10,6 +10,10 @@ resource "google_compute_instance" "nomad_servers" {
     }
   }
 
+  # attached_disk {
+  #   source = "${element(google_compute_disk.datanode-disks.*.self_link, 0)}"
+  # }
+
   scheduling {
     automatic_restart   = true
     on_host_maintenance = "MIGRATE"
@@ -37,6 +41,7 @@ data "template_file" "gcp_bootstrap_nomad_server" {
   vars {
     zone = "$(curl http://metadata.google.internal/computeMetadata/v1/instance/zone -H \"Metadata-Flavor: Google\" | cut -d\"/\" -f4)"
     region = "$(echo $${ZONE} | cut -d\"-\" -f1)"
+    idx = ""
     datacenter = "$(echo $${ZONE} | cut -d\"-\" -f1)-$(echo $${ZONE} | cut -d\"-\" -f2)"
     output_ip = "$(curl http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/ip -H \"Metadata-Flavor: Google\")"
     nomad_version = "0.8.3"
@@ -64,6 +69,10 @@ resource "google_compute_instance" "nomad_clients" {
       image = "${var.gcp_image}"
     }
   }
+  # TODO: remove attached disk
+  # attached_disk {
+  #   source = "${element(google_compute_disk.datanode-disks.*.self_link, count.index)}"
+  # }
 
   scheduling {
     automatic_restart   = true
@@ -92,6 +101,7 @@ data "template_file" "gcp_bootstrap_nomad_client" {
   template = "${file("bootstrap_nomad.tpl")}"
 
   vars {
+    idx = "${count.index}"
     zone = "$(curl http://metadata.google.internal/computeMetadata/v1/instance/zone -H \"Metadata-Flavor: Google\" | cut -d\"/\" -f4)"
     region = "$(echo $${ZONE} | cut -d\"-\" -f1)"
     datacenter = "$(echo $${ZONE} | cut -d\"-\" -f1)-$(echo $${ZONE} | cut -d\"-\" -f2)"
@@ -103,9 +113,18 @@ data "template_file" "gcp_bootstrap_nomad_client" {
     dns2 = "${data.terraform_remote_state.consul.gcp_consul_ips.1}"
     dns3 = "${data.terraform_remote_state.consul.gcp_consul_ips.2}"
     join = "\"retry_join\": [\"provider=gce tag_value=consul-servers\"]"
+    # persistent_disk = "/dev/sdb"
     persistent_disk = ""
     cloud = "gcp"
     node_class = "app"
     node_name = "server-gcp-nomad-clients-${count.index + 1}"
   }
+}
+
+resource "google_compute_disk" "datanode-disks" {
+  count = 0
+  type  = "pd-standard"
+  name  = "datanode-disks-${count.index + 1}"
+  zone  = "${var.gcp_region}-${element(var.az_gcp, count.index)}"
+  size  = 50
 }
