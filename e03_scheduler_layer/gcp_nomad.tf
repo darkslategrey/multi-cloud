@@ -64,10 +64,10 @@ resource "google_compute_instance" "nomad_clients" {
       image = "${var.gcp_image}"
     }
   }
-
-  attached_disk {
-    source = "${element(google_compute_disk.datanode-disks.*.self_link, count.index)}"
-  }
+  # TODO: remove attached disk
+  # attached_disk {
+  #   source = "${element(google_compute_disk.datanode-disks.*.self_link, count.index)}"
+  # }
 
   scheduling {
     automatic_restart   = true
@@ -115,10 +115,10 @@ data "template_file" "gcp_bootstrap_nomad_client" {
   }
 }
 
-resource "google_compute_disk" "datanode-disks" {
-  count = 3
-  type  = "pd-standard"
-  name  = "datanode-disks-${count.index + 1}"
-  zone  = "${var.gcp_region}-${element(var.az_gcp, count.index)}"
-  size = 50
-}
+# resource "google_compute_disk" "datanode-disks" {
+#   count = 3
+#   type  = "pd-standard"
+#   name  = "datanode-disks-${count.index + 1}"
+#   zone  = "${var.gcp_region}-${element(var.az_gcp, count.index)}"
+#   size = 50
+# }
