@@ -16,3 +16,10 @@ output "gcp_bastion_ip" {
       "${google_compute_instance.bastion.network_interface.0.address}"
   ]
 }
+
+output "traefik_ips" {
+  value = [
+    "${google_compute_address.traefik1.address}",
+    "${google_compute_address.traefik2.address}"
+  ]
+}

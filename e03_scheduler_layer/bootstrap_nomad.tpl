@@ -142,6 +142,7 @@ EOF
 	"cluster-store": "consul://consul.service.consul:8500",
 	"cluster-advertise": "eth0:2376",
 	"storage-driver": "devicemapper",
+  "userns-remap": "default",
 	"storage-opts": [
 		"dm.directlvm_device=${persistent_disk}",
 		"dm.thinp_percent=95",
@@ -267,6 +268,10 @@ else
   client {
 			node_class = "${node_class}"
       enabled = true
+      options = {
+        "driver.raw_exec.enable" = "1"
+        "docker.privileged.enabled" = "true"
+      }
   }
 EOF
 fi
@@ -310,4 +315,23 @@ Host installed successfully
 EOF
 }
 
+do_setup_clients_disk()
+{
+    cat <<EOF
+************************************
+Start setup disk
+************************************
+EOF
+    mkfs.ext4 -m 0 -F -E lazy_itable_init=0,lazy_journal_init=0,discard ${persistent_disk}
+    mkdir /data
+    cat <<EOF
+************************************
+End setup disk
+************************************
+EOF
+}
+
+# if [ $${NODE_TYPE} == "client" ]; then
+#     do_setup_clients_disk
+# fi
 do_install

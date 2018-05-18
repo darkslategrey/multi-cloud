@@ -1,7 +1,7 @@
 # Commons
 
 variable "domain" {
-  default = "exemple.com"
+  default = "courseur.com"
 }
 
 variable "test" {

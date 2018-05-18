@@ -65,6 +65,10 @@ resource "google_compute_instance" "nomad_clients" {
     }
   }
 
+  attached_disk {
+    source = "${element(google_compute_disk.datanode-disks.*.self_link, count.index)}"
+  }
+
   scheduling {
     automatic_restart   = true
     on_host_maintenance = "MIGRATE"
@@ -103,9 +107,18 @@ data "template_file" "gcp_bootstrap_nomad_client" {
     dns2 = "${data.terraform_remote_state.consul.gcp_consul_ips.1}"
     dns3 = "${data.terraform_remote_state.consul.gcp_consul_ips.2}"
     join = "\"retry_join\": [\"provider=gce tag_value=consul-servers\"]"
+    # persistent_disk = "/dev/sdb"
     persistent_disk = ""
     cloud = "gcp"
     node_class = "app"
     node_name = "server-gcp-nomad-clients-${count.index + 1}"
   }
+}
+
+resource "google_compute_disk" "datanode-disks" {
+  count = 3
+  type  = "pd-standard"
+  name  = "datanode-disks-${count.index + 1}"
+  zone  = "${var.gcp_region}-${element(var.az_gcp, count.index)}"
+  size = 50
 }
