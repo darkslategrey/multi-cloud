@@ -1,13 +1,3 @@
-# Commons
-
-variable "domain" {
-  default = "courseur.com"
-}
-
-variable "test" {
-  default = false
-}
-
 variable "gcp_project" {
   default = "courseur-1234"
 }
@@ -28,8 +18,8 @@ variable "az_gcp" {
     ]
 }
 
-variable "gcp_instance_type" {
-  default = "f1-micro"
+variable "gcp_client_instance_type" { 
+  default = "g1-small"
 }
 
 variable "gcp_image" {
