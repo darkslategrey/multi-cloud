@@ -1,4 +1,4 @@
-job "hashi-ui" {
+job "http-echo" {
   region = "europe"
   datacenters = ["europe-west1"]
 
@@ -7,21 +7,25 @@ job "hashi-ui" {
   group "server" {
     count = 1
 
-    task "hashi-ui" {
+    task "http-echo" {
       driver = "docker"
 
       config {
-        image        = "jippi/hashi-ui"
-        network_mode = "host"
-        privileged  = true
+        image        = "hashicorp/http-echo"
+        # network_mode = "host"
+        # privileged  = true
+        args = ["-text", "bonjour chez vous"]
+        port_map = {
+          http = 5678
+        }
       }
 
       service {
         port = "http"
         tags = [
-          "hashi-ui",
-          "hashi-ui-gcp-${NOMAD_ALLOC_INDEX}",
-          "traefik.frontend.rule=Host:hashi-ui.courseur.com",
+          "http-echo",
+          "http-echo-${NOMAD_ALLOC_INDEX}",
+          "traefik.frontend.rule=Host:http-echo.courseur.com",
           "traefik.tags=exposed"
         ]
         check {
@@ -30,14 +34,6 @@ job "hashi-ui" {
           interval = "10s"
           timeout  = "2s"
         }
-      }
-
-      env {
-        NOMAD_ENABLE = 1
-        NOMAD_ADDR   = "http://nomad.service.consul:4646"
-
-        CONSUL_ENABLE = 1
-        CONSUL_ADDR   = "http://consul.service.consul:8500"
       }
 
       resources {

@@ -1,0 +1,7 @@
+FROM ruby:2.5.1
+
+RUN mkdir /app && apt-get update && apt-get install redis-server -y && service start redis-server
+
+EXPOSE 6379
+
+CMD echo 'bonjour'

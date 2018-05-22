@@ -32,6 +32,7 @@ CONSUL_VERSION=${consul_version}
 NOMAD_VERSION=${nomad_version}
 DATACENTER=${datacenter}
 OUTPUT_IP=${output_ip}
+IDX=${idx}
 NODE_TYPE=${node_type}
 
 start_services()
@@ -322,16 +323,19 @@ do_setup_clients_disk()
 Start setup disk
 ************************************
 EOF
-    mkfs.ext4 -m 0 -F -E lazy_itable_init=0,lazy_journal_init=0,discard ${persistent_disk}
-    mkdir /data
+    mkfs.ext4 -m 0 -F -E lazy_itable_init=0,lazy_journal_init=0,discard /dev/sdb
     cat <<EOF
 ************************************
 End setup disk
 ************************************
 EOF
 }
-
-# if [ $${NODE_TYPE} == "client" ]; then
+#${persistent_disk}
+# if [ $${NODE_TYPE} == "client" && $${IDX} == 0]; then
 #     do_setup_clients_disk
 # fi
+
+# mkdir /data
+# mount /dev/sdb1 /data
+
 do_install

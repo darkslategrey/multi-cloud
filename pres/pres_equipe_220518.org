@@ -1,0 +1,210 @@
+#+REVEAL_ROOT: http://cdn.jsdelivr.net/reveal.js/3.0.0/
+#+OPTIONS: num:nil toc:nil
+#+REVEAL_TRANS: linear
+#+REVEAL_THEME: black
+#+Title: Nouvelle Infra Courseur
+#+Email: gregory@courseur.com
+
+* Plan
+#+BEGIN_NOTES
+  Enter speaker notes here.
+#+END_NOTES
+#+ATTR_REVEAL: :frag (fade-in)
+- Problematique
+- Objectifs
+- Quelques offres disponibles infra
+- Quelques offres disponibles logiciels
+- Solution choisie
+- Exemples de codes
+- Etat d'avancement
+- La suite
+* Problématique
+** Client / serveur
+   [[./client_server.png]]
+   #+REVEAL: split
+   [[./browser.jpg]]
+   #+REVEAL: split
+   #+CAPTION: autour 1945
+   [[./eniac.jpg]]
+   #+REVEAL: split
+   [[./eniac2.jpg]]
+   #+REVEAL: split
+   [[./pc.jpg]]
+   #+REVEAL: split
+   [[./3-tier2.jpg]]
+   #+REVEAL: split
+   [[./3-tier.jpg]]
+** Mise a l'echelle
+   [[./Data-Center-Scale-Up-and-Out.png]]
+** Virtualisation
+   [[./containers-vs-vm.png]]
+* Les objectifs
+#+ATTR_REVEAL: :frag (fade-in)
+- S'adapter a la charge
+- Etre tolerant aux pannes
+- Garantir une certaine securite
+- Au meilleur prix
+- Infrastructure as code
+* Quelques offres infra
+#+BEGIN_NOTES
+Parler du prix a la demande
+#+END_NOTES
+#+ATTR_REVEAL: :frag (fade-in)
+- Google Cloud Platform
+- AWS
+- OpenShift
+- Azure
+- ...
+* Quelques offres logiciels
+[[./Chart_Docker-Swarm-Swap-Plug-and-Play.png]]
+#+REVEAL: split
+#+CAPTION: by google
+#+ATTR_HTML: :alt kubernetes :title kubernetes
+#+ATTR_HTML: :width 50% :height 50%
+[[./kube.png]]
+#+REVEAL: split
+#+CAPTION: by redhat (kubernetes)
+#+ATTR_HTML: :alt openshift :title openshift
+#+ATTR_HTML: :width 50% :height 50%
+[[./OpenShift-LogoType.svg.png]]
+#+REVEAL: split
+#+CAPTION: by hashicorp
+#+ATTR_HTML: :alt nomad :title nomad
+[[./nomad.png]]
+* Solution choisie
+La suite Hashicorp
+#+ATTR_REVEAL: :frag (fade-in)
+- a la unix
+- consul (decouverte de services)
+- terraform (creation de l'infra
+- vault (systeme de gestion des secrets)
+- nomad (orchestrateur de conteneurs entre autres)
+- traefik (load balancer)
+* Types de deploiements possibles
+- 
+  [[./facebook-canary-strategy.jpg]]
+-
+  [[./bluegreen.jpg]]
+* Exemples de code
+** Terraform (creation de l'infra)
+   #+BEGIN_SRC
+resource "google_compute_instance" "nomad_servers" {
+  count        = 3
+  name         = "server-gcp-nomad-servers-${count.index + 1}"
+  machine_type = "${var.gcp_server_instance_type}"
+  zone         = "${var.gcp_region}-${element(var.az_gcp, count.index)}"
+
+  boot_disk {
+    initialize_params {
+      image = "${var.gcp_image}"
+    }
+  }
+
+  # attached_disk {
+  #   source = "${element(google_compute_disk.datanode-disks.*.self_link, 0)}"
+  # }
+  #+END_SRC
+  #+REVEAL: split
+  #+BEGIN_SRC
+  scheduling {
+    automatic_restart   = true
+    on_host_maintenance = "MIGRATE"
+  }
+
+  tags = ["nomad-servers", "consul-clients"]
+
+  network_interface {
+    subnetwork = "${data.terraform_remote_state.network.gcp_priv_subnet}"
+  }
+
+  service_account {
+    scopes = [
+        "https://www.googleapis.com/auth/compute.readonly"
+      ]
+  }
+
+  metadata_startup_script = "${element(data.template_file.gcp_bootstrap_nomad_server.*.rendered, count.index)}"
+}
+   #+END_SRC
+** Nomad (lancement des jobs / gestion des conteneurs)
+   #+BEGIN_SRC
+job "demoapp" {
+  region = "europe"
+  datacenters = ["europe-west1"]
+
+  type = "service"
+
+  update {
+    canary       = 1
+    max_parallel = 1
+  }
+#+END_SRC
+  #+REVEAL: split
+  #+BEGIN_SRC
+  group "webs" {
+    count = 2
+
+    restart {
+      attempts = 3
+      delay    = "30s"
+      interval = "2m"
+      mode = "delay"
+    }
+
+    task "frontend" {
+      driver = "docker"
+
+      config {
+        image = "httpd"
+        port_map = {
+          http = 80
+        }
+      }
+#+END_SRC
+  #+REVEAL: split
+#+BEGIN_SRC
+      service {
+        port = "http"
+        tags = [
+          "traefik.frontend.rule=Host:demo.exemple.com",
+          "traefik.tags=exposed"
+          ]
+      }
+
+      resources {
+        cpu    = 200
+        memory = 64
+
+        network {
+          mbits = 10
+          port "http" {
+          }
+        }
+      }
+    }
+  }
+}
+#+END_SRC
+* Etat d'avancement
++CAPTION: https://bitbucket.org/courseur/infra/src/master/
+#+ATTR_HTML: width: 100px, height: 100px
+[[./bitbucket.png]]
+#+REVEAL: split
+#+CAPTION: Infra
+#+ATTR_HTML: :alt infra :title infra
+[[./Multi-cloud-step03.png]]
+#+REVEAL: split
+[[./traefik.png]]
+* La suite
+#+ATTR_REVEAL: :frag (fade-in)
+- load balancer externe
+- https
+- integration vault
+- VPN
+- jmeter
+- env de staging
+- integration des apps
+- cluster pour les donnees
+- decoupage de l'app en 'micro services'
+* ?
+Merci de votre attention !

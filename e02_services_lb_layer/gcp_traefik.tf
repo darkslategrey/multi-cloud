@@ -12,6 +12,10 @@ resource "google_compute_instance" "traefik" {
     }
   }
 
+  # attached_disk {
+  #   source = "${element(google_compute_disk.persistent-disks.*.self_link, count.index)}"
+  # }
+
   scheduling {
     automatic_restart   = true
     on_host_maintenance = "MIGRATE"
@@ -46,8 +50,9 @@ data "template_file" "gcp_traefik_bootstrap" {
     domain = "${var.domain}"
     zone = "$(curl http://metadata.google.internal/computeMetadata/v1/instance/zone -H \"Metadata-Flavor: Google\" | cut -d\"/\" -f4)"
     datacenter = "$(echo $${ZONE} | cut -d\"-\" -f1)-$(echo $${ZONE} | cut -d\"-\" -f2)"
-    # output_ip = "$(curl http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/ip -H \"Metadata-Flavor: Google\")"
-    output_ip = "$(curl https://www.googleapis.com/compute/v1/projects/courseur-1234/regions/europe-west1/addresses/traefik-${count.index + 1}-ip -H \"Metadata-Flavor: Google\")"
+    output_ip = "$(curl http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/ip -H \"Metadata-Flavor: Google\")"
+    # output_ip = "$(curl https://www.googleapis.com/compute/v1/projects/courseur-1234/regions/europe-west1/addresses/traefik-${count.index + 1}-ip -H \"Metadata-Flavor: Google\")"
+    # output_ip = "${data.terraform_remote_state.network.traefik_ips[count.index]}"
     # output_ip = "${data.terraform_remote_state.traefik-ips.google_compute_address.traefik}"
     consul_version = "1.0.7"
     traefik_version = "1.3.2"
