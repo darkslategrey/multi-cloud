@@ -17,27 +17,28 @@
 - Solution choisie
 - Exemples de codes
 - Etat d'avancement
+- Exemple de workflow
 - La suite
 * Problématique
 ** Client / serveur
-   [[./client_server.png]]
+   [[./images/client_server.png]]
    #+REVEAL: split
-   [[./browser.jpg]]
+   [[./images/browser.jpg]]
    #+REVEAL: split
    #+CAPTION: autour 1945
-   [[./eniac.jpg]]
+   [[./images/eniac.jpg]]
    #+REVEAL: split
-   [[./eniac2.jpg]]
+   [[./images/eniac2.jpg]]
    #+REVEAL: split
-   [[./pc.jpg]]
+   [[./images/pc.jpg]]
    #+REVEAL: split
-   [[./3-tier2.jpg]]
+   [[./images/3-tier2.jpg]]
    #+REVEAL: split
-   [[./3-tier.jpg]]
+   [[./images/3-tier.jpg]]
 ** Mise a l'echelle
-   [[./Data-Center-Scale-Up-and-Out.png]]
+   [[./images/Data-Center-Scale-Up-and-Out.png]]
 ** Virtualisation
-   [[./containers-vs-vm.png]]
+   [[./images/containers-vs-vm.png]]
 * Les objectifs
 #+ATTR_REVEAL: :frag (fade-in)
 - S'adapter a la charge
@@ -56,21 +57,21 @@ Parler du prix a la demande
 - Azure
 - ...
 * Quelques offres logiciels
-[[./Chart_Docker-Swarm-Swap-Plug-and-Play.png]]
+[[./images/Chart_Docker-Swarm-Swap-Plug-and-Play.png]]
 #+REVEAL: split
 #+CAPTION: by google
 #+ATTR_HTML: :alt kubernetes :title kubernetes
 #+ATTR_HTML: :width 50% :height 50%
-[[./kube.png]]
+[[./images/kube.png]]
 #+REVEAL: split
 #+CAPTION: by redhat (kubernetes)
 #+ATTR_HTML: :alt openshift :title openshift
 #+ATTR_HTML: :width 50% :height 50%
-[[./OpenShift-LogoType.svg.png]]
+[[./images/OpenShift-LogoType.svg.png]]
 #+REVEAL: split
 #+CAPTION: by hashicorp
 #+ATTR_HTML: :alt nomad :title nomad
-[[./nomad.png]]
+[[./images/nomad.png]]
 * Solution choisie
 La suite Hashicorp
 #+ATTR_REVEAL: :frag (fade-in)
@@ -81,10 +82,9 @@ La suite Hashicorp
 - nomad (orchestrateur de conteneurs entre autres)
 - traefik (load balancer)
 * Types de deploiements possibles
-- 
-  [[./facebook-canary-strategy.jpg]]
--
-  [[./bluegreen.jpg]]
+  [[./images/facebook-canary-strategy.jpg]]
+  #+REVEAL: split
+  [[./images/bluegreen.jpg]]
 * Exemples de code
 ** Terraform (creation de l'infra)
    #+BEGIN_SRC
@@ -186,15 +186,71 @@ job "demoapp" {
 }
 #+END_SRC
 * Etat d'avancement
-+CAPTION: https://bitbucket.org/courseur/infra/src/master/
+#+CAPTION: https://bitbucket.org/courseur/infra/src/master/
 #+ATTR_HTML: width: 100px, height: 100px
-[[./bitbucket.png]]
+[[./images/bitbucket.png]]
 #+REVEAL: split
 #+CAPTION: Infra
 #+ATTR_HTML: :alt infra :title infra
-[[./Multi-cloud-step03.png]]
+[[./images/Multi-cloud-step03.png]]
 #+REVEAL: split
-[[./traefik.png]]
+[[./images/traefik.png]]
+* Exemple de workflow
+** Les PR's
+  #+begin_src plantuml :file images/PRs.png
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+actor developer
+rectangle SCM {
+  developer --> (repo) : Pull Request
+  (repo) --> (developer) : decline
+  (repo) --> (developer) : test fail
+  (repo) -> Jenkins : Accepted PR web hook
+}
+rectangle Jenkins {
+  (deploy staging) --> Nomad_Server
+}
+rectangle Nomad_Server {
+   (nomad client 1)
+   (nomad client 2)
+   (nomad client 3)
+}
+@enduml
+#+end_src
+
+#+RESULTS:
+[[file:images/PRs.png]]
+
+** Les versions
+  #+begin_src plantuml :file ./images/versions.png
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+actor developer
+
+rectangle SCM {
+  developer --> (GIT) : TAG 'release/v0.0.3'
+  (GIT) --> Jenkins : web hook build image
+}
+rectangle Jenkins {
+  (deploy) --> Google_Registry : publish image
+  (deploy) --> Nomad_Server : run job
+}
+rectangle Google_Registry {
+   (API:v0.0.3)
+   (API:v0.0.2)
+   (API:v0.0.1)
+}
+rectangle Nomad_Server {
+   (nomad client 1)
+   (nomad client 2)
+   (nomad client 3)
+}
+@enduml
+#+end_src
+#+RESULTS:
+[[file:./images/versions.png]]
 * La suite
 #+ATTR_REVEAL: :frag (fade-in)
 - load balancer externe
@@ -206,5 +262,6 @@ job "demoapp" {
 - integration des apps
 - cluster pour les donnees
 - decoupage de l'app en 'micro services'
+- monitoring et alerting : grafana / prometheus
 * ?
 Merci de votre attention !
